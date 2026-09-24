@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GitPrompt — Repository to build prompt</title>
+<meta name="description" content="Turn any public GitHub repository into a prompt your AI coding agent can build from.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header>
+  <div class="wrap header-inner">
+    <a class="logo" href="/">
+      <span class="logo-mark">⌘</span>
+      GitPrompt
+    </a>
+    <nav>
+      <a href="#how">How it works</a>
+      <a class="repo-link" href="https://github.com" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero wrap">
+    <h1>Repository to build prompt.</h1>
+    <p class="sub">Paste any public GitHub URL. GitPrompt reads the repository — and, in Deep Rebuild mode, its actual source code via a local LLM — and produces a specification prompt your AI coding agent can implement against.</p>
+
+    <div class="mode-tabs" role="tablist">
+      <button class="mode-tab active" data-mode="overview" role="tab">Overview <span class="tab-tag">fast · no LLM</span></button>
+      <button class="mode-tab" data-mode="rebuild" role="tab">Deep Rebuild <span class="tab-tag">reads real code</span></button>
+    </div>
+
+    <form class="prompt-form" id="prompt-form">
+      <div class="input-row">
+        <input id="repo-input" type="text" placeholder="github.com/owner/repository" autocomplete="off" spellcheck="false">
+        <button class="btn btn-primary" type="submit" id="generate-btn">Get prompt</button>
+      </div>
+
+      <!-- Overview options -->
+      <div class="manual-panel open" id="overview-panel">
+        <h3>Include in the prompt</h3>
+        <div class="manual-grid">
+          <label class="check-row"><input type="checkbox" name="architecture" checked> Architecture overview</label>
+          <label class="check-row"><input type="checkbox" name="dependencies" checked> Key dependencies</label>
+          <label class="check-row"><input type="checkbox" name="structure" checked> File structure</label>
+          <label class="check-row"><input type="checkbox" name="tests"> Test coverage notes</label>
+          <label class="check-row"><input type="checkbox" name="setup" checked> Setup &amp; env variables</label>
+          <label class="check-row"><input type="checkbox" name="issues" checked> Known issues / TODOs</label>
+        </div>
+      </div>
+
+      <!-- Deep Rebuild options -->
+      <div class="manual-panel" id="rebuild-panel">
+        <h3>Local model (Ollama)</h3>
+        <div class="model-row">
+          <select id="model-select" disabled>
+            <option>Checking Ollama…</option>
+          </select>
+          <button type="button" class="btn btn-ghost" id="refresh-models" title="Refresh model list">↻</button>
+          <select id="ctx-select" title="Context window override">
+            <option value="">Auto context</option>
+            <option value="8192">8k context</option>
+            <option value="16384">16k context</option>
+            <option value="32768">32k context</option>
+            <option value="131072">128k context</option>
+          </select>
+        </div>
+        <p class="model-note" id="model-note">Requires a local <a href="https://ollama.com" target="_blank" rel="noopener">Ollama</a> instance with a pulled model.</p>
+        <div class="progress-line" id="progress-line" hidden>
+          <span class="spinner"></span>
+          <span id="progress-text">Working…</span>
+        </div>
+      </div>
+
+      <div class="actions-row">
+        <span class="form-hint" id="form-hint">Or paste any GitHub URL with "hub" swapped for "prompt".</span>
+      </div>
+    </form>
+  </section>
+
+  <section class="examples wrap">
+    <div class="examples-label">Try an example</div>
+    <div class="example-chips">
+      <button class="chip" data-repo="pallets/flask">flask</button>
+      <button class="chip" data-repo="fastapi/fastapi">fastapi</button>
+      <button class="chip" data-repo="Textualize/rich">rich</button>
+      <button class="chip" data-repo="encode/uvicorn">uvicorn</button>
+      <button class="chip" data-repo="python-poetry/poetry">poetry</button>
+    </div>
+  </section>
+
+  <section class="result wrap" id="result">
+    <div class="result-head">
+      <h2 id="result-title">Prompt</h2>
+      <div class="result-actions">
+        <button class="btn btn-ghost" id="cancel-btn" hidden>Cancel</button>
+        <button class="btn btn-ghost" id="download-btn" hidden>Download .md</button>
+        <button class="copy-btn" id="copy-btn">Copy prompt</button>
+      </div>
+    </div>
+    <div class="prompt-box mono" id="prompt-output"></div>
+  </section>
+
+  <section class="how wrap" id="how">
+    <h2>How it works</h2>
+    <div class="how-grid">
+      <div class="how-card">
+        <div class="how-num">1</div>
+        <h3>Read the repository</h3>
+        <p>GitPrompt pulls the repo's metadata — or, in Deep Rebuild mode, downloads the full source archive from GitHub.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-num">2</div>
+        <h3>Build context</h3>
+        <p>Overview assembles structure and dependencies instantly. Deep Rebuild selects the most important source files that fit your model's context window.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-num">3</div>
+        <h3>Generate the prompt</h3>
+        <p>Your local Ollama model synthesizes a build specification, wrapped in an agent-ready prompt with an ordered implementation checklist.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <span>GitPrompt</span>
+  <span>Runs locally · Your code never leaves your machine</span>
+</footer>
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
