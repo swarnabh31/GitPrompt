@@ -30,9 +30,9 @@ Open http://127.0.0.1:5000
 2. Pull a model — quality scales with model size:
 
    ```bash
-   ollama pull llama3.2        # 3B, fast, small context
-   ollama pull qwen2.5:14b     # good balance
-   ollama pull llama3.3:70b    # best quality, needs serious hardware
+   ollama pull gemma4:12b         # 8B, fast
+   ollama pull gpt-oss:20b     # good balance
+   ollama pull qwen3.8:27b    # best quality, needs serious hardware
    ```
 
 3. The model dropdown in the UI lists everything installed locally and
